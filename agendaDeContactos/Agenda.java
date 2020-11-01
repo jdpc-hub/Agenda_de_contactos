@@ -19,8 +19,8 @@ class Agenda {
 	
 	/**
 	 * Busca una posición disponible para agregar un contacto. Si la agenda está
-	 * llena, entonces retorna contacto.length, lo que causará una excepción en
-	 * tiempo de ejecución de tipo ArrayIndexOutOfBoundsException.
+	 * llena, el método lanza una excepción que contiene un mensaje diciendo que
+	 * la agenda está llena.
 	 * */
 	private int posDisponible() throws Exception {
 		int i;
