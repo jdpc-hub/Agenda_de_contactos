@@ -4,152 +4,141 @@ import java.util.Scanner;
 
 class Agenda {
 
-    //Variables de instancia
-    private int numeroDeContactos;
-    private Contacto[] contacto;
+	//Variables de instancia
+	private Contacto[] contacto;
 
-    //Constructor
-    Agenda(int cantidad) {
-	numeroDeContactos = 0;
-	contacto = new Contacto[cantidad];
-	System.out.println
-	    ("Se ha creado una agenda con capacidad para "+cantidad+
-	     " contactos.\n");
-    }
-
-    //Métodos
-    private void contactoCreado() {
-	numeroDeContactos++;
-	System.out.println("Un cotacto ha sido creado con éxito.\n");
-    }
-
-    /**
-     * Añade un contacto a la lista de cotactos.
-     */
-    void addContacto(Contacto contacto) {
-	this.contacto[numeroDeContactos] = contacto;
-	contactoCreado();
-    }
-
-    /**
-     * Añade un contacto solicitando al usuario los datos por teclado.
-     */
-    void addContacto() {
-	Scanner entrada = new Scanner(System.in).useDelimiter("\n");
-	
-	contacto[numeroDeContactos] = new Contacto();
-
-	System.out.print("Ingrese el nombre del contacto: ");
-	contacto[numeroDeContactos].setNombre(entrada.next());
-	
-	System.out.print("Ingrese los apellidos del contacto: ");
-	contacto[numeroDeContactos].setApellido(entrada.next());
-	
-	System.out.print("Ingrese el email del contacto: ");
-	contacto[numeroDeContactos].setEmail(entrada.next());
-
-	System.out.print("Ingrese el número de teléfono del contacto: ");
-	contacto[numeroDeContactos].setTelefono(entrada.next());
-	
-	System.out.print("Ingrese la dirección del contacto: ");
-	contacto[numeroDeContactos].setDireccion(entrada.next());
-	
-	System.out.print("¿Qué tipo de contacto es? (personal, empresa, etc.) ");
-	contacto[numeroDeContactos].setTipoContacto(entrada.next());
-	
-	System.out.println();
-	contactoCreado();
-    }
-
-    void mostrarContacto(int i) {
-	System.out.println
-	    (i+1+". "+contacto[i].getNombre()+" "+contacto[i].getApellido()+"\n"+
-	     "    Telefono: "+contacto[i].getTelefono()+'\n'+
-	     "    Email: "+contacto[i].getEmail()+'\n'+
-	     "    Dirección: "+contacto[i].getDireccion()+'\n'+
-	     "    Tipo de contacto: "+contacto[i].getTipoContacto());
-	System.out.println();
-    }
-
-    void listarContactos() {
-	System.out.println("Lista de contactos:\n");
-	if (numeroDeContactos == 0) {
-	    System.out.println("    La agenda está vacía.\n");
+	//Constructor
+	Agenda(int cantidad) {
+		contacto = new Contacto[cantidad];
+		System.out.println("Se ha creado una agenda con capacidad para "+cantidad+" contactos.\n");
 	}
-	for (int i = 0; i < numeroDeContactos; i++) {
-	    mostrarContacto(i);
+
+	/////////////
+	// Métodos //
+	/////////////
+	
+	/**
+	 * Busca una posición disponible para agregar un contacto. Si la agenda está
+	 * llena, entonces retorna contacto.length, lo que causará una excepción en
+	 * tiempo de ejecución de tipo ArrayIndexOutOfBoundsException.
+	 * */
+	private int posDisponible() throws Exception {
+		int i;
+		for (i = 0; i < contacto.length; i++) {
+			if (contacto[i] == null) {
+				return i;
+			}
+		}
+		throw new Exception("La agenda está llena");
 	}
-    }
-
-    private void contactoEliminado() {
-	System.out.println("Un contacto ha sido eliminado con éxito.\n");
-	numeroDeContactos--;
-    }
-
-    /**
-     * Elimina el contacto i de la agenda y desplaza todos los contactos desde i+1
-     * hasta numeroDeContactos-1 un lugar hacia atrás para cubrir el espacio que
-     * deja i.
-     */
-    void eliminarContacto(int i) {
-	contacto[i] = null;
-	for ( ; i < numeroDeContactos - 1; i++) {
-	    contacto[i] = contacto[i+1];
+	
+	/**
+	 * Añade un contacto a la lista de cotactos.
+	 */
+	void addContacto(Contacto nuevoContacto) {
+		int i;
+		try {
+			i = posDisponible();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			return;
+		}
+		contacto[i] = nuevoContacto;
+		System.out.println("Un cotacto ha sido agregado a la agenda.\n");
 	}
-	System.out.println();
-	contactoEliminado();
-    }
-
-    void buscarPorNombre(String nombre) {
-	int contador = 0;
-	for (int i = 0; i < numeroDeContactos; i++) {
-	    if (contacto[i].getNombre().toLowerCase().
-		contains(nombre.toLowerCase())) {
-		mostrarContacto(i);
-		contador++;
-	    }
+	
+	void addContacto() {
+		int i;
+		try {
+			i = posDisponible();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			return;
+		}
+		Scanner entrada = new Scanner(System.in);
+		String nombre, apellidos, email, telefono, direccion, tipoContacto;
+		System.out.print("Ingrese el nombre del nuevo contacto: ");
+		nombre = entrada.nextLine();
+		System.out.print("Ingrese los apellidos del nuevo contacto: ");
+		apellidos = entrada.nextLine();
+		System.out.print("Ingrese el email del nuevo contacto: ");
+		email = entrada.nextLine();
+		System.out.print("Ingrese el telefono del nuevo contacto: ");
+		telefono = entrada.nextLine();
+		System.out.print("Ingrese la dirección del nuevo contacto: ");
+		direccion = entrada.nextLine();
+		System.out.print("¿Qué tipo de contacto es? ");
+		tipoContacto = entrada.nextLine();
+		Contacto nuevoContacto = new Contacto(nombre, apellidos, email, telefono, direccion, tipoContacto);
+		contacto[i] = nuevoContacto;
+		System.out.println("\nUn cotacto ha sido agregado a la agenda.\n");
+		entrada.close();
 	}
-	if (contador == 0) {
-	    System.out.println
-		("\n    No hay ningun contacto que coincida con ese nombre.\n");
+
+	void mostrarContacto(int i) {
+		System.out.println(
+			contacto[i].getNombre()+" "+contacto[i].getApellido()+"\n"+
+			"    id: "+i+"\n"+
+			"    Telefono: "+contacto[i].getTelefono()+"\n"+
+			"    Email: "+contacto[i].getEmail()+"\n"+
+			"    Dirección: "+contacto[i].getDireccion()+"\n"+
+			"    Tipo de contacto: "+contacto[i].getTipoContacto()+"\n");
 	}
-    }
 
-    private void contactoEditado() {
-	System.out.println("Un contacto ha sido editado con éxito.\n");
-    }
+	void listarContactos() {
+		System.out.println("Lista de contactos:\n");
+		if (contacto[0] == null) {
+			System.out.println("---> La agenda está vacía.\n");
+			return;
+		}
+		for (int i = 0; i < contacto.length && contacto[i] != null; i++) {
+			mostrarContacto(i);
+		}
+	}
 
-    void editarContacto(int i) {
-	Scanner entrada = new Scanner(System.in).useDelimiter("\n");
+	void eliminarContacto() {
+		if (contacto[0] == null) {
+			System.out.println("---> La agenda está vacía.\n");
+			return;
+		}
+		System.out.print("Ingrese el id del contacto a eliminar: ");
+		Scanner entrada = new Scanner(System.in);
+		int i = entrada.nextInt();
+		entrada.close();
+		try {
+			if (contacto[i] == null) {
+				System.out.println("---> No existe un contacto con ese id.\n");
+				return;
+			}
+		} catch (ArrayIndexOutOfBoundsException e) {
+			System.out.println("---> No existe un contacto con ese id.\n");
+			return;
+		}
+		int j;//Índice del último contacto en la lista
+		try {
+			j = posDisponible() - 1;
+		} catch (Exception e) {
+			j = contacto.length - 1;
+		}
+		contacto[i] = contacto[j];
+		contacto[j] = null;
+		System.out.println("\nSe ha eliminado un contacto.\n");
+	}
 	
-	System.out.println("El contacto seleccionado es: ");
-	mostrarContacto(i);
-	System.out.print("¿Es correcto? S/N ");
-	String respuesta = entrada.next().toLowerCase();
-	if (respuesta.equals("n")) {
-	    System.out.println();
-	    return;
-	    }
-	
-	System.out.print("Ingrese el nuevo nombre del contacto: ");
-	contacto[i].setNombre(entrada.next());
-	
-	System.out.print("Ingrese los nuevos apellidos del contacto: ");
-	contacto[i].setApellido(entrada.next());
-	
-	System.out.print("Ingrese el nuevo email del contacto: ");
-	contacto[i].setEmail(entrada.next());
-
-	System.out.print("Ingrese el nuevo número de teléfono del contacto: ");
-	contacto[i].setTelefono(entrada.next());
-	
-	System.out.print("Ingrese la nueva dirección del contacto: ");
-	contacto[i].setDireccion(entrada.next());
-	
-	System.out.print("¿Qué tipo de contacto es? (personal, empresa, etc.) ");
-	contacto[i].setTipoContacto(entrada.next());
-	
-	System.out.println();
-	contactoEditado();
-    }
+	void buscarPorNombre() {
+		System.out.print("Ingrese el nombre del contacto que busca: ");
+		Scanner entrada = new Scanner(System.in);
+		String nombre = entrada.nextLine();
+		entrada.close();
+		int contador = 0;
+		for (int i = 0; i < contacto.length && contacto[i] != null; i++) {
+			if (contacto[i].getNombre().toLowerCase().contains(nombre.toLowerCase())) {
+				mostrarContacto(i);
+				contador++;
+			}
+		}
+		if (contador == 0) {
+			System.out.println("---> No se encontró ninguna coincidencia.");
+		}
+	}
 }
